@@ -1,5 +1,5 @@
 --start
-Select location, date, total_cases, new_cases, total_deaths, population
+Select location, date, total_cases, new_cases, total_deaths, new_deaths, population
 From [PORTFOLIO PROJECT]..CovidDeaths$
 order by 1,2
 
@@ -12,7 +12,7 @@ where location like '%states%' and date like '%2021%'
 order by 1,2 DESC
 
 --total cases vs population
---shows what percentage of population infected with covid in 2021
+--shows percentage of population infected with covid in 2021 in US
 
 Select location, date, total_cases, population, (total_cases/population)*100 as population_infected
 From [PORTFOLIO PROJECT]..CovidDeaths$
@@ -38,7 +38,7 @@ select distinct location
 from [PORTFOLIO PROJECT]..CovidDeaths$
 order by 1
 
---return countries with highest death count (only not continents)
+--return countries with highest death count (not continents)
 
 Select location, MAX(cast(total_deaths as int)) AS Highestdeathcount
 From [PORTFOLIO PROJECT]..CovidDeaths$
@@ -122,3 +122,29 @@ WHERE CovidDeaths$.continent IS NOT NULL
 
 select *
 from PERCENTPOPVACCINATED
+
+--end
+
+
+--CHOOSING queries for Tableau
+
+SELECT SUM(total_cases) AS total_cases_sum, SUM(CAST(total_deaths AS INT)) AS total_deaths_sum, (SUM(CAST(total_deaths AS INT))/SUM(total_cases))*100 AS DeathPercentage
+FROM [PORTFOLIO PROJECT]..CovidDeaths$
+WHERE continent IS NOT NULL
+ORDER BY 1,2
+
+Select location, MAX(cast(total_deaths as int)) AS TOTALdeathcount, MAX(cast(total_cases as int)) AS TOTALcasescount 
+From [PORTFOLIO PROJECT]..CovidDeaths$
+where continent is null
+GROUP BY LOCATION
+order by TOTALdeathcount DESC
+
+Select Location, Population, MAX(total_cases) as HighestInfectionCount,  Max((total_cases/population))*100 as PercentPopulationInfected
+From [PORTFOLIO PROJECT]..CovidDeaths$
+Group by Location, Population
+order by PercentPopulationInfected desc
+
+Select Location, Population,date, MAX(total_cases) as HighestInfectionCount,  Max((total_cases/population))*100 as PercentPopulationInfected
+From [PORTFOLIO PROJECT]..CovidDeaths$
+Group by Location, Population, date
+order by PercentPopulationInfected desc
